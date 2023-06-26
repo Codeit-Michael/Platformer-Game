@@ -39,12 +39,41 @@ class Level:
 			self.world_shift = 0
 			player.speed = 3
 
+	def horizontal_movement_collision(self):
+		player = self.player.sprite
+		player.rect.x += player.direction.x * player.speed
+
+		for sprite in self.tiles.sprites():
+			if sprite.rect.colliderect(player.rect):
+				# checks if moving towards left
+				if player.direction.x < 0:
+					player.rect.left = sprite.rect.right
+				# checks if moving towards right
+				elif player.direction.x > 0:
+					player.rect.right = sprite.rect.left
+
+	def vertical_movement_collision(self):
+		player = self.player.sprite
+		player.apply_gravity()
+
+		for sprite in self.tiles.sprites():
+			if sprite.rect.colliderect(player.rect):
+				# checks if moving towards bottom
+				if player.direction.y > 0:
+					player.rect.bottom = sprite.rect.top
+					player.direction.y = 0
+				# checks if moving towards up
+				elif player.direction.y < 0:
+					player.rect.top = sprite.rect.bottom
+
 	def draw(self, key_clicked):
 		# for tile
 		self.tiles.update(self.world_shift)
 		self.tiles.draw(self.display_surface)
+		self.scroll_x()
 
 		# for player
-		self.scroll_x()
 		self.player.update(key_clicked)
+		self.horizontal_movement_collision()
+		self.vertical_movement_collision()
 		self.player.draw(self.display_surface)

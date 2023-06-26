@@ -3,7 +3,7 @@ import pygame
 class Player(pygame.sprite.Sprite):
 	def __init__(self, pos):
 		super().__init__()
-		self.image = pygame.Surface((25, 50))
+		self.image = pygame.Surface((25, 40))
 		self.image.fill(pygame.Color("indigo"))
 		self.rect = self.image.get_rect(topleft = pos)
 
@@ -34,6 +34,3 @@ class Player(pygame.sprite.Sprite):
 			self.jump()
 		else:
 			self.get_input(clicked_key)
-
-		self.rect.x += self.direction.x * self.speed
-		self.apply_gravity()
