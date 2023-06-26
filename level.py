@@ -65,6 +65,7 @@ class Level:
 				# checks if moving towards up
 				elif player.direction.y < 0:
 					player.rect.top = sprite.rect.bottom
+					player.direction.y = 0
 
 	def draw(self, key_clicked):
 		# for tile
