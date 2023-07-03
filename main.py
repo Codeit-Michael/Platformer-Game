@@ -10,7 +10,7 @@ clock = pygame.time.Clock()
 level = Level(level_map, screen)
 clicked_key = False
 
-bg_img = pygame.image.load('img/bg/bg-img.jpg')
+bg_img = pygame.image.load('img/bg/bg.jpg')
 bg_img = pygame.transform.scale(bg_img, (WIDTH, HEIGHT))
 
 while True:
