@@ -1,18 +1,22 @@
 import pygame
 from tile import Tile
+from trap import Trap
 from settings import tile_size, WIDTH
 from player import Player
+from game import game_over
 
-class Level:
-	def __init__(self, level_data, surface):
+class World:
+	def __init__(self, world_data, surface):
 		self.display_surface = surface
-		self.level_data = level_data
-		self.setup_level(level_data)
+		self.world_data = world_data
+		self.setup_world(world_data)
 		self.world_shift = 0
 		self.current_x = 0
+		self.gravity = 0.7
 
-	def setup_level(self, layout):
+	def setup_world(self, layout):
 		self.tiles = pygame.sprite.Group()
+		self.traps = pygame.sprite.Group()
 		self.player = pygame.sprite.GroupSingle()
 
 		for row_index, row in enumerate(layout):
@@ -21,9 +25,13 @@ class Level:
 				if cell == "X":
 					tile = Tile((x, y), tile_size)
 					self.tiles.add(tile)
+				elif cell == "s":
+					tile = Trap((x, y), tile_size)
+					self.traps.add(tile)
 				elif cell == "P":
 					player_sprite = Player((x, y))
 					self.player.add(player_sprite)
+
 
 	def scroll_x(self):
 		player = self.player.sprite
@@ -39,6 +47,10 @@ class Level:
 		else:
 			self.world_shift = 0
 			player.speed = 3
+
+	def apply_gravity(self, player):
+		player.direction.y += self.gravity
+		player.rect.y += player.direction.y
 
 	def horizontal_movement_collision(self):
 		player = self.player.sprite
@@ -63,7 +75,7 @@ class Level:
 
 	def vertical_movement_collision(self):
 		player = self.player.sprite
-		player.apply_gravity()
+		self.apply_gravity(player)
 
 		for sprite in self.tiles.sprites():
 			if sprite.rect.colliderect(player.rect):
@@ -82,14 +94,34 @@ class Level:
 		if player.on_ceiling and player.direction.y > 0:
 			player.on_ceiling = False
 
-	def draw(self, key_clicked):
+	def handle_traps(self):
+		player = self.player.sprite
+
+		for sprite in self.traps.sprites():
+			if sprite.rect.colliderect(player.rect):
+				if player.direction.x < 0 or player.direction.y > 0:
+					player.rect.x += tile_size
+				elif player.direction.x > 0 or player.direction.y > 0:
+					player.rect.x -= tile_size
+				# Note: add delay to life subtracter
+				player.life -= 1
+		game_over() if player.life <= 0 else None
+
+
+	def draw(self, player_event):
 		# for tile
 		self.tiles.update(self.world_shift)
 		self.tiles.draw(self.display_surface)
+
+		# for trap
+		self.traps.update(self.world_shift)
+		self.traps.draw(self.display_surface)
+
 		self.scroll_x()
 
 		# for player
-		self.player.update(key_clicked)
+		self.player.update(player_event)
 		self.horizontal_movement_collision()
 		self.vertical_movement_collision()
+		self.handle_traps()
 		self.player.draw(self.display_surface)

@@ -9,14 +9,16 @@ class Player(pygame.sprite.Sprite):
 		self.animation_speed = 0.15
 		self.image = self.animations["idle"][self.frame_index]
 		self.rect = self.image.get_rect(topleft = pos)
+		self.mask = pygame.mask.from_surface(self.image)
 
 		# player movement
 		self.direction = pygame.math.Vector2(0, 0)
 		self.speed = 5
 		self.gravity = 0.8
-		self.jump_speed = -16
+		self.jump_move = -16
 
 		# player status
+		self.life = 3
 		self.status = "idle"
 		self.facing_right = True
 		self.on_ground = False
@@ -26,7 +28,7 @@ class Player(pygame.sprite.Sprite):
 
 
 	def import_character_assets(self):
-		character_path = "img/pete/"
+		character_path = "assets/pete/"
 		self.animations = {
 			"idle": [],
 			"walk": [],
@@ -45,7 +47,7 @@ class Player(pygame.sprite.Sprite):
 		if self.frame_index >= len(animation):
 			self.frame_index = 0
 		image = animation[int(self.frame_index)]
-		image = pygame.transform.scale(image, (50, 50))
+		image = pygame.transform.scale(image, (35, 50))
 		if self.facing_right:
 			self.image = image
 		else:
@@ -65,16 +67,14 @@ class Player(pygame.sprite.Sprite):
 			self.rect = self.image.get_rect(bottomleft = self.rect.topleft)
 		elif self.on_ceiling:
 			self.rect = self.image.get_rect(midtop = self.rect.midtop)
-		# else:
-		# 	self.rect = self.image.get_rect(center = self.rect.center)
 
-	def get_input(self, clicked_key):
-		if clicked_key != False:
-			if clicked_key == "right":
+	def get_input(self, player_event):
+		if player_event != False:
+			if player_event == "right":
 				self.direction.x = 1
 				self.facing_right = True
 				self.animate()
-			elif clicked_key == "left":
+			elif player_event == "left":
 				self.direction.x = -1
 				self.facing_right = False
 				self.animate()
@@ -92,17 +92,21 @@ class Player(pygame.sprite.Sprite):
 		else:
 			self.status = "idle"
 
-	def apply_gravity(self):
-		self.direction.y += self.gravity
-		self.rect.y += self.direction.y
+	# def apply_gravity(self):
+	# 	self.direction.y += self.gravity
+	# 	self.rect.y += self.direction.y
 
 	def jump(self):
-		self.direction.y = self.jump_speed
+		self.direction.y = self.jump_move
 
-	def update(self, clicked_key):
+	def update(self, player_event):
 		self.get_status()
-		if clicked_key == "space" and self.on_ground:
+		if player_event == "win" and self.on_ground:
 			self.jump()
+		elif player_event == "space" and self.on_ground:
+			self.jump()
+
 		else:
-			self.get_input(clicked_key)
+			self.get_input(player_event)
+
 
