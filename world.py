@@ -3,7 +3,8 @@ from tile import Tile
 from trap import Trap
 from settings import tile_size, WIDTH
 from player import Player
-from game import game_over
+from game import Game
+from goal import Goal
 
 class World:
 	def __init__(self, world_data, surface):
@@ -13,11 +14,13 @@ class World:
 		self.world_shift = 0
 		self.current_x = 0
 		self.gravity = 0.7
+		self.game = Game()
 
 	def setup_world(self, layout):
 		self.tiles = pygame.sprite.Group()
 		self.traps = pygame.sprite.Group()
 		self.player = pygame.sprite.GroupSingle()
+		self.goal = pygame.sprite.GroupSingle()
 
 		for row_index, row in enumerate(layout):
 			for col_index, cell in enumerate(row):
@@ -31,7 +34,9 @@ class World:
 				elif cell == "P":
 					player_sprite = Player((x, y))
 					self.player.add(player_sprite)
-
+				elif cell == "G":
+					goal_sprite = Goal((x, y), tile_size)
+					self.goal.add(goal_sprite)
 
 	def scroll_x(self):
 		player = self.player.sprite
@@ -105,10 +110,9 @@ class World:
 					player.rect.x -= tile_size
 				# Note: add delay to life subtracter
 				player.life -= 1
-		game_over() if player.life <= 0 else None
+		# game_over() if player.life <= 0 else None
 
-
-	def draw(self, player_event):
+	def update(self, player_event):
 		# for tile
 		self.tiles.update(self.world_shift)
 		self.tiles.draw(self.display_surface)
@@ -116,6 +120,11 @@ class World:
 		# for trap
 		self.traps.update(self.world_shift)
 		self.traps.draw(self.display_surface)
+
+		# for goal
+		self.goal.update(self.world_shift)
+		self.goal.draw(self.display_surface)
+
 
 		self.scroll_x()
 
@@ -125,3 +134,5 @@ class World:
 		self.vertical_movement_collision()
 		self.handle_traps()
 		self.player.draw(self.display_surface)
+
+		self.game.game_state(self.player.sprite, self.goal.sprite)

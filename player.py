@@ -91,10 +91,7 @@ class Player(pygame.sprite.Sprite):
 			self.status = "walk"
 		else:
 			self.status = "idle"
-
-	# def apply_gravity(self):
-	# 	self.direction.y += self.gravity
-	# 	self.rect.y += self.direction.y
+		# add hurt animation
 
 	def jump(self):
 		self.direction.y = self.jump_move
@@ -105,7 +102,6 @@ class Player(pygame.sprite.Sprite):
 			self.jump()
 		elif player_event == "space" and self.on_ground:
 			self.jump()
-
 		else:
 			self.get_input(player_event)
 
