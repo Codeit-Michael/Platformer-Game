@@ -30,7 +30,7 @@ class Player(pygame.sprite.Sprite):
 
 
 	def import_character_assets(self):
-		character_path = "assets/pete/"
+		character_path = "assets/player/"
 		self.animations = {
 			"idle": [],
 			"walk": [],
