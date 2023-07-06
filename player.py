@@ -18,7 +18,9 @@ class Player(pygame.sprite.Sprite):
 		self.jump_move = -16
 
 		# player status
-		self.life = 3
+		self.life = 5
+		self.game_over = False
+		self.win = False
 		self.status = "idle"
 		self.facing_right = True
 		self.on_ground = False
@@ -33,7 +35,8 @@ class Player(pygame.sprite.Sprite):
 			"idle": [],
 			"walk": [],
 			"jump": [],
-			"fall": []
+			"fall": [],
+			"lose": []
 		}
 		for animation in self.animations.keys():
 			full_path = character_path + animation
@@ -91,18 +94,20 @@ class Player(pygame.sprite.Sprite):
 			self.status = "walk"
 		else:
 			self.status = "idle"
-		# add hurt animation
 
 	def jump(self):
 		self.direction.y = self.jump_move
 
 	def update(self, player_event):
 		self.get_status()
-		if player_event == "win" and self.on_ground:
-			self.jump()
-		elif player_event == "space" and self.on_ground:
-			self.jump()
+		if self.life > 0 and not self.game_over:
+			if player_event == "space" and self.on_ground:
+				self.jump()
+			else:
+				self.get_input(player_event)
+		elif self.game_over and self.win:
+			pass
 		else:
-			self.get_input(player_event)
-
-
+			self.direction.x = 0
+			self.status = "lose"
+			self.animate()

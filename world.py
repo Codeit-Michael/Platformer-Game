@@ -7,14 +7,14 @@ from game import Game
 from goal import Goal
 
 class World:
-	def __init__(self, world_data, surface):
-		self.display_surface = surface
+	def __init__(self, world_data, screen):
+		self.screen = screen
 		self.world_data = world_data
 		self.setup_world(world_data)
 		self.world_shift = 0
 		self.current_x = 0
 		self.gravity = 0.7
-		self.game = Game()
+		self.game = Game(self.screen)
 
 	def setup_world(self, layout):
 		self.tiles = pygame.sprite.Group()
@@ -29,7 +29,7 @@ class World:
 					tile = Tile((x, y), tile_size)
 					self.tiles.add(tile)
 				elif cell == "s":
-					tile = Trap((x, y), tile_size)
+					tile = Trap((x + (tile_size // 4), y + (tile_size // 4)), tile_size // 2)
 					self.traps.add(tile)
 				elif cell == "P":
 					player_sprite = Player((x, y))
@@ -43,10 +43,10 @@ class World:
 		player_x = player.rect.centerx
 		direction_x = player.direction.x
 
-		if player_x < WIDTH // 4 and direction_x < 0:
+		if player_x < WIDTH // 3 and direction_x < 0:
 			self.world_shift = 8
 			player.speed = 0
-		elif player_x > WIDTH - (WIDTH // 4) and direction_x > 0:
+		elif player_x > WIDTH - (WIDTH // 3) and direction_x > 0:
 			self.world_shift = -8
 			player.speed = 0
 		else:
@@ -110,29 +110,28 @@ class World:
 					player.rect.x -= tile_size
 				# Note: add delay to life subtracter
 				player.life -= 1
-		# game_over() if player.life <= 0 else None
 
 	def update(self, player_event):
 		# for tile
 		self.tiles.update(self.world_shift)
-		self.tiles.draw(self.display_surface)
+		self.tiles.draw(self.screen)
 
 		# for trap
 		self.traps.update(self.world_shift)
-		self.traps.draw(self.display_surface)
+		self.traps.draw(self.screen)
 
 		# for goal
 		self.goal.update(self.world_shift)
-		self.goal.draw(self.display_surface)
-
+		self.goal.draw(self.screen)
 
 		self.scroll_x()
 
 		# for player
-		self.player.update(player_event)
 		self.horizontal_movement_collision()
 		self.vertical_movement_collision()
 		self.handle_traps()
-		self.player.draw(self.display_surface)
+		self.player.update(player_event)
+		self.game.show_life(self.player.sprite)
+		self.player.draw(self.screen)
 
 		self.game.game_state(self.player.sprite, self.goal.sprite)
