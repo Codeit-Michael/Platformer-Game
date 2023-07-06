@@ -36,7 +36,8 @@ class Player(pygame.sprite.Sprite):
 			"walk": [],
 			"jump": [],
 			"fall": [],
-			"lose": []
+			"lose": [],
+			"win": []
 		}
 		for animation in self.animations.keys():
 			full_path = character_path + animation
@@ -106,7 +107,9 @@ class Player(pygame.sprite.Sprite):
 			else:
 				self.get_input(player_event)
 		elif self.game_over and self.win:
-			pass
+			self.direction.x = 0
+			self.status = "win"
+			self.animate()
 		else:
 			self.direction.x = 0
 			self.status = "lose"
