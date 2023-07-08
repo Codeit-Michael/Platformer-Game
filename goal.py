@@ -8,5 +8,6 @@ class Goal(pygame.sprite.Sprite):
 		self.image = pygame.transform.scale(self.image, (size, size))
 		self.rect = self.image.get_rect(topleft = pos)
 
+	# update object position due to world scroll
 	def update(self, x_shift):
 		self.rect.x += x_shift

@@ -9,7 +9,7 @@ class Game:
 		self.font = pygame.font.SysFont("impact", 70)
 		self.message_color = pygame.Color("darkorange")
 
-	# if player ran out of life or fell in the platform
+	# if player ran out of life or fell below the platform
 	def _game_lose(self, player):
 		player.game_over = True
 		message = self.font.render('You Lose...', True, self.message_color)

@@ -13,7 +13,7 @@ class Platformer:
 		self.clock = pygame.time.Clock()
 		self.player_event = False
 
-		self.bg_img = pygame.image.load('assets/bg/bg.jpg')
+		self.bg_img = pygame.image.load('assets/terrain/bg.jpg')
 		self.bg_img = pygame.transform.scale(self.bg_img, (width, height))
 
 	def main(self):

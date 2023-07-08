@@ -12,6 +12,7 @@ class Trap(pygame.sprite.Sprite):
 		self.mask = pygame.mask.from_surface(self.image)
 		self.rect = self.image.get_rect(topleft = pos)
 
+	# adds the spinning effect to the Blade trap
 	def _animate(self):
 		sprites = self.blade_img
 		sprite_index = (self.frame_index // self.animation_delay) % len(sprites)
@@ -22,6 +23,7 @@ class Trap(pygame.sprite.Sprite):
 		if self.frame_index // self.animation_delay > len(sprites):
 			self.frame_index = 0
 
+	# update object position due to world scroll
 	def update(self, x_shift):
 		self._animate()
 		self.rect.x += x_shift

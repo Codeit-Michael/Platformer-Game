@@ -1,10 +1,10 @@
 import pygame
+from settings import tile_size, WIDTH
 from tile import Tile
 from trap import Trap
-from settings import tile_size, WIDTH
+from goal import Goal
 from player import Player
 from game import Game
-from goal import Goal
 
 class World:
 	def __init__(self, world_data, screen):
@@ -16,6 +16,7 @@ class World:
 		self.gravity = 0.7
 		self.game = Game(self.screen)
 
+	# generates the world
 	def _setup_world(self, layout):
 		self.tiles = pygame.sprite.Group()
 		self.traps = pygame.sprite.Group()
@@ -28,7 +29,7 @@ class World:
 				if cell == "X":
 					tile = Tile((x, y), tile_size)
 					self.tiles.add(tile)
-				elif cell == "s":
+				elif cell == "t":
 					tile = Trap((x + (tile_size // 4), y + (tile_size // 4)), tile_size // 2)
 					self.traps.add(tile)
 				elif cell == "P":
@@ -38,6 +39,7 @@ class World:
 					goal_sprite = Goal((x, y), tile_size)
 					self.goal.add(goal_sprite)
 
+	# world scroll when the player is walking towards left/right
 	def _scroll_x(self):
 		player = self.player.sprite
 		player_x = player.rect.centerx
@@ -53,10 +55,12 @@ class World:
 			self.world_shift = 0
 			player.speed = 3
 
+	# add gravity for player to fall
 	def _apply_gravity(self, player):
 		player.direction.y += self.gravity
 		player.rect.y += player.direction.y
 
+	# prevents player to pass through objects horizontally
 	def _horizontal_movement_collision(self):
 		player = self.player.sprite
 		player.rect.x += player.direction.x * player.speed
@@ -78,6 +82,7 @@ class World:
 		if player.on_right and (player.rect.right > self.current_x or player.direction.x <= 0):
 			player.on_right = False
 
+	# prevents player to pass through objects vertically
 	def _vertical_movement_collision(self):
 		player = self.player.sprite
 		self._apply_gravity(player)
@@ -99,6 +104,7 @@ class World:
 		if player.on_ceiling and player.direction.y > 0:
 			player.on_ceiling = False
 
+	# add consequences when player run through traps
 	def _handle_traps(self):
 		player = self.player.sprite
 
@@ -108,9 +114,9 @@ class World:
 					player.rect.x += tile_size
 				elif player.direction.x > 0 or player.direction.y > 0:
 					player.rect.x -= tile_size
-				# Note: add delay to life subtracter
 				player.life -= 1
 
+	# updating the game world from all changes commited
 	def update(self, player_event):
 		# for tile
 		self.tiles.update(self.world_shift)

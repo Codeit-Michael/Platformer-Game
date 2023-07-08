@@ -27,7 +27,7 @@ class Player(pygame.sprite.Sprite):
 		self.on_left = False
 		self.on_right = False
 
-
+	# gets all the image needed for animating specific player action
 	def _import_character_assets(self):
 		character_path = "assets/player/"
 		self.animations = {
@@ -42,6 +42,7 @@ class Player(pygame.sprite.Sprite):
 			full_path = character_path + animation
 			self.animations[animation] = import_sprite(full_path)
 
+	# animates the player actions
 	def _animate(self):
 		animation = self.animations[self.status]
 
@@ -71,20 +72,22 @@ class Player(pygame.sprite.Sprite):
 		elif self.on_ceiling:
 			self.rect = self.image.get_rect(midtop = self.rect.midtop)
 
+	# checks if the player is moving towards left or right or not moving
 	def _get_input(self, player_event):
 		if player_event != False:
 			if player_event == "right":
 				self.direction.x = 1
 				self.facing_right = True
-				self._animate()
 			elif player_event == "left":
 				self.direction.x = -1
 				self.facing_right = False
-				self._animate()
 		else:
 			self.direction.x = 0
-			self._animate()
 
+	def _jump(self):
+		self.direction.y = self.jump_move
+
+	# identifies player action
 	def _get_status(self):
 		if self.direction.y < 0:
 			self.status = "jump"
@@ -95,9 +98,7 @@ class Player(pygame.sprite.Sprite):
 		else:
 			self.status = "idle"
 
-	def _jump(self):
-		self.direction.y = self.jump_move
-
+	# update the player's state
 	def update(self, player_event):
 		self._get_status()
 		if self.life > 0 and not self.game_over:
@@ -108,8 +109,7 @@ class Player(pygame.sprite.Sprite):
 		elif self.game_over and self.win:
 			self.direction.x = 0
 			self.status = "win"
-			self._animate()
 		else:
 			self.direction.x = 0
 			self.status = "lose"
-			self._animate()
+		self._animate()
