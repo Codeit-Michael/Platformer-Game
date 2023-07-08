@@ -10,13 +10,13 @@ class World:
 	def __init__(self, world_data, screen):
 		self.screen = screen
 		self.world_data = world_data
-		self.setup_world(world_data)
+		self._setup_world(world_data)
 		self.world_shift = 0
 		self.current_x = 0
 		self.gravity = 0.7
 		self.game = Game(self.screen)
 
-	def setup_world(self, layout):
+	def _setup_world(self, layout):
 		self.tiles = pygame.sprite.Group()
 		self.traps = pygame.sprite.Group()
 		self.player = pygame.sprite.GroupSingle()
@@ -38,7 +38,7 @@ class World:
 					goal_sprite = Goal((x, y), tile_size)
 					self.goal.add(goal_sprite)
 
-	def scroll_x(self):
+	def _scroll_x(self):
 		player = self.player.sprite
 		player_x = player.rect.centerx
 		direction_x = player.direction.x
@@ -53,11 +53,11 @@ class World:
 			self.world_shift = 0
 			player.speed = 3
 
-	def apply_gravity(self, player):
+	def _apply_gravity(self, player):
 		player.direction.y += self.gravity
 		player.rect.y += player.direction.y
 
-	def horizontal_movement_collision(self):
+	def _horizontal_movement_collision(self):
 		player = self.player.sprite
 		player.rect.x += player.direction.x * player.speed
 
@@ -78,9 +78,9 @@ class World:
 		if player.on_right and (player.rect.right > self.current_x or player.direction.x <= 0):
 			player.on_right = False
 
-	def vertical_movement_collision(self):
+	def _vertical_movement_collision(self):
 		player = self.player.sprite
-		self.apply_gravity(player)
+		self._apply_gravity(player)
 
 		for sprite in self.tiles.sprites():
 			if sprite.rect.colliderect(player.rect):
@@ -99,7 +99,7 @@ class World:
 		if player.on_ceiling and player.direction.y > 0:
 			player.on_ceiling = False
 
-	def handle_traps(self):
+	def _handle_traps(self):
 		player = self.player.sprite
 
 		for sprite in self.traps.sprites():
@@ -124,12 +124,12 @@ class World:
 		self.goal.update(self.world_shift)
 		self.goal.draw(self.screen)
 
-		self.scroll_x()
+		self._scroll_x()
 
 		# for player
-		self.horizontal_movement_collision()
-		self.vertical_movement_collision()
-		self.handle_traps()
+		self._horizontal_movement_collision()
+		self._vertical_movement_collision()
+		self._handle_traps()
 		self.player.update(player_event)
 		self.game.show_life(self.player.sprite)
 		self.player.draw(self.screen)

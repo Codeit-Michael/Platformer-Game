@@ -1,10 +1,10 @@
 import pygame
-from support import import_folder
+from support import import_sprite
 
 class Player(pygame.sprite.Sprite):
 	def __init__(self, pos):
 		super().__init__()
-		self.import_character_assets()
+		self._import_character_assets()
 		self.frame_index = 0
 		self.animation_speed = 0.15
 		self.image = self.animations["idle"][self.frame_index]
@@ -14,7 +14,6 @@ class Player(pygame.sprite.Sprite):
 		# player movement
 		self.direction = pygame.math.Vector2(0, 0)
 		self.speed = 5
-		self.gravity = 0.8
 		self.jump_move = -16
 
 		# player status
@@ -29,7 +28,7 @@ class Player(pygame.sprite.Sprite):
 		self.on_right = False
 
 
-	def import_character_assets(self):
+	def _import_character_assets(self):
 		character_path = "assets/player/"
 		self.animations = {
 			"idle": [],
@@ -41,9 +40,9 @@ class Player(pygame.sprite.Sprite):
 		}
 		for animation in self.animations.keys():
 			full_path = character_path + animation
-			self.animations[animation] = import_folder(full_path)
+			self.animations[animation] = import_sprite(full_path)
 
-	def animate(self):
+	def _animate(self):
 		animation = self.animations[self.status]
 
 		# loop over frame index
@@ -72,21 +71,21 @@ class Player(pygame.sprite.Sprite):
 		elif self.on_ceiling:
 			self.rect = self.image.get_rect(midtop = self.rect.midtop)
 
-	def get_input(self, player_event):
+	def _get_input(self, player_event):
 		if player_event != False:
 			if player_event == "right":
 				self.direction.x = 1
 				self.facing_right = True
-				self.animate()
+				self._animate()
 			elif player_event == "left":
 				self.direction.x = -1
 				self.facing_right = False
-				self.animate()
+				self._animate()
 		else:
 			self.direction.x = 0
-			self.animate()
+			self._animate()
 
-	def get_status(self):
+	def _get_status(self):
 		if self.direction.y < 0:
 			self.status = "jump"
 		elif self.direction.y > 1:
@@ -96,21 +95,21 @@ class Player(pygame.sprite.Sprite):
 		else:
 			self.status = "idle"
 
-	def jump(self):
+	def _jump(self):
 		self.direction.y = self.jump_move
 
 	def update(self, player_event):
-		self.get_status()
+		self._get_status()
 		if self.life > 0 and not self.game_over:
 			if player_event == "space" and self.on_ground:
-				self.jump()
+				self._jump()
 			else:
-				self.get_input(player_event)
+				self._get_input(player_event)
 		elif self.game_over and self.win:
 			self.direction.x = 0
 			self.status = "win"
-			self.animate()
+			self._animate()
 		else:
 			self.direction.x = 0
 			self.status = "lose"
-			self.animate()
+			self._animate()

@@ -10,13 +10,13 @@ class Game:
 		self.message_color = pygame.Color("darkorange")
 
 	# if player ran out of life or fell in the platform
-	def game_lose(self, player):
+	def _game_lose(self, player):
 		player.game_over = True
 		message = self.font.render('You Lose...', True, self.message_color)
 		self.screen.blit(message,(WIDTH // 3 + 70, 70))
 
 	# if player reach the goal
-	def game_win(self, player):
+	def _game_win(self, player):
 		player.game_over = True
 		player.win = True
 		message = self.font.render('You Win!!', True, self.message_color)
@@ -25,9 +25,9 @@ class Game:
 	# checks if the game is over or not, and if win or lose
 	def game_state(self, player, goal):
 		if player.life <= 0 or player.rect.y >= HEIGHT:
-			self.game_lose(player)
+			self._game_lose(player)
 		elif player.rect.colliderect(goal.rect):
-			self.game_win(player)
+			self._game_win(player)
 		else:
 			None
 
